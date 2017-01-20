@@ -41,8 +41,8 @@ class SignKey {
     this.ref = ref;
   }
 
-  getRaw() {
-    return Promise.reject(new Error('Not Implemented'));
+  getRaw(handle) {
+    return lib.sign_key_get(this.app, handle);
   }
 }
 
@@ -52,10 +52,9 @@ class PubEncKey {
     this.ref = ref;
   }
 
-  getRaw() {
-    return Promise.reject(new Error('Not Implemented'));
+  getRaw(handle) {
+    return lib.enc_key_get(this.app, handle);
   }
-
 }
 
 
@@ -64,19 +63,6 @@ class AuthProvider {
     this._app = app;
     this._registered = false;
     this.setupUri();
-  }
-
-  refreshContainerAccess() {
-    return Promise.reject(new Error('Not Implemented'));
-  }
-
-  canAccessContainer(name, permissions) {
-    return Promise.reject(new Error('Not Implemented'));
-  }
-
-  getAccessContainerInfo(name) {
-    // -> return app.mutuableData.MutuableData
-    return Promise.reject(new Error('Not Implemented'));
   }
 
   setupUri() {
@@ -155,24 +141,28 @@ class AuthProvider {
 
   // app key management
   getPubSignKey() {
-    // -> SignKey
-    return Promise.reject(new Error('Not Implemented'));
+    return lib.app_pub_sign_key(this.app).then(c => new SignKey(this.app, c));
   }
 
   getPubEncKey() {
-    // -> EncKey
-    return Promise.reject(new Error('Not Implemented'));
+    return lib.app_pub_enc_key(this.app).then(c => new PubEncKey(this.app, c));
   }
 
   getSignKeyFromRaw(raw) {
-    // -> SignKey
-    return Promise.reject(new Error('Not Implemented'));
+    return lib.sign_key_new(this.app, data).then(c => new SignKey(this.app, c));
   }
 
   getEncKeyKeyFromRaw(raw) {
-    // -> EncKey
-    return Promise.reject(new Error('Not Implemented'));
+    return lib.enc_key_new(this.app, data).then(c => new PubEncKey(this.app, c));
   }
-};
+
+  freeSignKey(handle) {
+    return lib.sign_key_free(this.app, handle);
+  }
+
+  freeEncKey(handle) {
+    return lib.enc_key_free(this.app, handle);
+  }
+}
 
 module.exports = AuthProvider;

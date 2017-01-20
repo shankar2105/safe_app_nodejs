@@ -4,31 +4,16 @@ const h = require('./helpers');
 describe('Immutable Data', () => {
   const app = h.createAuthenticatedTestApp();
   it('write read simple ', () => {
-<<<<<<< HEAD
-    const testString = `1test-${Math.random()}`;
+    const testString = "test-" + Math.random();
 
     return app.immutableData.create().then((w) =>
       w.write(testString).then(() => w.close())
-    ).then((addr) => app.immutableData.fetch(addr)
-      .then((r) => r.read())
-    ).then((res) => {
-      should(res.toString()).equal(testString);
-    });
-  });
-});
-=======
-
-    const testString = "test-" + Math.random();
-
-    return app.immutableData.create().then((w) => 
-      w.write(testString).then(() => w.close())
     ).then(addr => {console.log(addr); return app.immutableData.fetch(addr)
-      // .then(r => r.read())
-    }
+        // .then(r => r.read())
+      }
     ).then(res => {
       should(Buffer.isBuffer(res)).should.be.true();
       should(res.toString()).equal(testString);
     })
   });
 });
->>>>>>> array-types

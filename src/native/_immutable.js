@@ -34,11 +34,7 @@ module.exports = {
     idata_close_self_encryptor: h.Promisified(null, t.XOR_NAME),
     idata_fetch_self_encryptor: h.Promisified(null, SEReadHandle),
     idata_size: h.Promisified(null, t.u64),
-<<<<<<< HEAD
-    idata_read_from_self_encryptor: h.Promisified(null, [t.u8Pointer, t.usize, t.usize], h.asBuffer),
-=======
     idata_read_from_self_encryptor: h.Promisified(null, [t.u8, t.usize, t.usize]),
->>>>>>> array-types
     idata_self_encryptor_writer_free: h.Promisified(null, null),
     idata_self_encryptor_reader_free: h.Promisified(null,  null),
   }
