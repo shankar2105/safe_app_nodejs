@@ -7,8 +7,6 @@ const helpers = base.helpers;
 const t = base.types;
 const makeFfiString = base.helpers.makeFfiString;
 
-const MDataInfoHandle = ref.refType(t.Void);
-
 module.exports = {
   types: {
     MDataInfoHandle

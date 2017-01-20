@@ -61,11 +61,23 @@ module.exports = {
         const b = new Buffer(str);
         return new FfiString({ptr: b, len: b.length, cap: b.length});
     },
+    asBuffer: function(res) {
+      return ref.reinterpret(res[0], res[1]);
+    },
     asFFIString: function(str) {
       return [makeFfiString(str)]
     },
-    Promisified: function(formatter, rTypes) {
+    Promisified: function(formatter, rTypes, after) {
+      // create internal function that will be
+      // invoked ontop of the direct binding
+      // mixing a callback into the arguments
+      // and returning a promise
       return (lib, fn) => (function() {
+        // the internal function that wraps the
+        // actual function call
+
+        // if there is a formatter, we are reformatting
+        // the incoming arguments first
         const args = formatter ? formatter.apply(formatter, arguments): Array.prototype.slice.call(arguments);
         let types = ['pointer', i32]; // user_context, error
         if (Array.isArray(rTypes)) {
@@ -76,17 +88,17 @@ module.exports = {
         return new Promise((resolve, reject) => {
           args.push(ref.NULL);
           args.push(ffi.Callback("void", types,
-              function(uctx, err) {
-                console.log("received", arguments);
-                if(err !== 0) return reject(makeFfiError(err));
-                // only one item or more?
-                let res = types.length === 3 ? arguments[2] : Array.prototype.slice.call(arguments, 2);
-                resolve(res);
-              }));
+            function(uctx, err) {
+              console.log("received", arguments);
+              if(err !== 0) return reject(makeFfiError(err));
+              // only one item or more?
+              let res = types.length === 3 ? arguments[2] : Array.prototype.slice.call(arguments, 2);
+              resolve(res);
+            }));
           console.log("calling", args);
           fn.apply(fn, args);
-        })
-      })
+        });
+      });
     }
   }
-}
+};
