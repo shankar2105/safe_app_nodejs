@@ -12,6 +12,7 @@ class CipherOptProvider {
   constructor(app) {
     this.app = app;
   }
+<<<<<<< HEAD
 
   newPlainText() {
     return lib.cipher_opt_new_plaintext(this.app.connection)
@@ -29,4 +30,11 @@ class CipherOptProvider {
   }
 
 }
+=======
+  new_plain() {
+    return lib.cipher_opt_new_plaintext(this.app.connection).then(c => new CipherOpt(this.app, c));
+  }
+}
+
+>>>>>>> array-types
 module.exports = CipherOptProvider;

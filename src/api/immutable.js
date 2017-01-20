@@ -4,6 +4,7 @@ const lib = require('../native/lib');
 
 class ImmutableDataReader extends helpers.NetworkObject {
 
+<<<<<<< HEAD
   read(options) { // -> Promise
     const opts = Object.assign({}, options);
     let prms;
@@ -18,6 +19,10 @@ class ImmutableDataReader extends helpers.NetworkObject {
                                          this.ref,
                                          opts.offset || 0,
                                          len));
+=======
+  read() { // -> Promise
+    return lib.idata_read_from_self_encryptor(this.app.connection, this.ref);
+>>>>>>> array-types
   }
 
   size() { // -> Promise
@@ -44,10 +49,16 @@ class ImmutableDataWriter extends helpers.NetworkObject {
   }
 
   close() {
+<<<<<<< HEAD
     return this.app.cipherOpt.newPlainText().then((opt) =>
       lib.idata_close_self_encryptor(this.app.connection,
                                      this.ref,
                                      opt.ref));
+=======
+    return this.app.cipherOpt.new_plain().then(opt =>{
+      console.log(opt);
+          return lib.idata_close_self_encryptor(this.app.connection, this.ref, opt.ref)});
+>>>>>>> array-types
   }
 
   save() {
@@ -68,12 +79,20 @@ class ImmutableData {
 
   create() {
     return lib.idata_new_self_encryptor(this.app.connection)
+<<<<<<< HEAD
       .then((ref) => helpers.autoref(new ImmutableDataWriter(this.app, ref)));
+=======
+      .then((x) => helpers.autoref(new ImmutableDataWriter(this.app, x)));
+>>>>>>> array-types
   }
 
   fetch(address) {
     return lib.idata_fetch_self_encryptor(this.app.connection, address)
+<<<<<<< HEAD
       .then((ref) => helpers.autoref(new ImmutableDataReader(this.app, ref)));
+=======
+      .then((x) => helpers.autoref(new ImmutableDataReader(this.app, x)));
+>>>>>>> array-types
   }
 }
 

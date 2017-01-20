@@ -20,8 +20,13 @@ const FfiString = new Struct({
 });
 
 const FfiStringPointer = new ref.refType(FfiString);
+<<<<<<< HEAD
 const u8Array = new ArrayType(u8);
 const XOR_NAME = new ArrayType(u8, 32); // FIXME: use exported const instead
+=======
+const u8Array = ArrayType(u8);
+const XOR_NAME = ArrayType(u8, 32); // FIXME: use exported const instead
+>>>>>>> array-types
 
 const ObjectHandle = u64;
 const App = Struct({});
@@ -78,15 +83,20 @@ module.exports = {
         // if there is a formatter, we are reformatting
         // the incoming arguments first
         const args = formatter ? formatter.apply(formatter, arguments): Array.prototype.slice.call(arguments);
+<<<<<<< HEAD
         
         // compile the callback-types-definiton
         let types = ['pointer', i32]; // we always have: user_context, error
+=======
+        let types = ['pointer', i32]; // user_context, error
+>>>>>>> array-types
         if (Array.isArray(rTypes)) {
           types = types.concat(rTypes);
         } else if (rTypes) {
           types.push(rTypes);
         }
         return new Promise((resolve, reject) => {
+<<<<<<< HEAD
           // append user-context and callback
           // to the arguments
           args.push(ref.NULL);
@@ -108,6 +118,18 @@ module.exports = {
                 resolve(res);
               }));
           // and call the function
+=======
+          args.push(ref.NULL);
+          args.push(ffi.Callback("void", types,
+              function(uctx, err) {
+                console.log("received", arguments);
+                if(err !== 0) return reject(makeFfiError(err));
+                // only one item or more?
+                let res = types.length === 3 ? arguments[2] : Array.prototype.slice.call(arguments, 2);
+                resolve(res);
+              }));
+          console.log("calling", args);
+>>>>>>> array-types
           fn.apply(fn, args);
         });
       });
