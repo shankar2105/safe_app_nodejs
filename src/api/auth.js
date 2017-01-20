@@ -41,8 +41,12 @@ class SignKey {
     this.ref = ref;
   }
 
-  getRaw(handle) {
-    return lib.sign_key_get(this.app, handle);
+  getRaw() {
+    return lib.sign_key_get(this.app.connection, this.ref);
+  }
+
+  free() {
+    return lib.sign_key_free(this.app.connection, this.ref);
   }
 }
 
@@ -52,8 +56,12 @@ class PubEncKey {
     this.ref = ref;
   }
 
-  getRaw(handle) {
-    return lib.enc_key_get(this.app, handle);
+  getRaw() {
+    return lib.enc_key_get(this.app.connection, this.ref);
+  }
+
+  free() {
+    return lib.enc_key_free(this.app.connection, this.ref);
   }
 }
 
@@ -77,6 +85,10 @@ class AuthProvider {
 
   get registered() {
     return this._registered;
+  }
+
+  free() {
+    return lib.app_free(this._app.connection);
   }
 
   genAuthUri(permissions, opts) {
@@ -135,33 +147,21 @@ class AuthProvider {
     });
   }
 
-  freeAppHandle(app) {
-    return lib.app_free(app);
-  }
-
   // app key management
   getPubSignKey() {
-    return lib.app_pub_sign_key(this.app).then(c => new SignKey(this.app, c));
+    return lib.app_pub_sign_key(this.app.connection).then(c => new SignKey(this.app, c));
   }
 
   getPubEncKey() {
-    return lib.app_pub_enc_key(this.app).then(c => new PubEncKey(this.app, c));
+    return lib.app_pub_enc_key(this.app.connection).then(c => new PubEncKey(this.app, c));
   }
 
   getSignKeyFromRaw(raw) {
-    return lib.sign_key_new(this.app, data).then(c => new SignKey(this.app, c));
+    return lib.sign_key_new(this.app.connection, data).then(c => new SignKey(this.app, c));
   }
 
   getEncKeyKeyFromRaw(raw) {
-    return lib.enc_key_new(this.app, data).then(c => new PubEncKey(this.app, c));
-  }
-
-  freeSignKey(handle) {
-    return lib.sign_key_free(this.app, handle);
-  }
-
-  freeEncKey(handle) {
-    return lib.enc_key_free(this.app, handle);
+    return lib.enc_key_new(this.app.connection, data).then(c => new PubEncKey(this.app, c));
   }
 }
 

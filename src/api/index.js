@@ -7,6 +7,7 @@ const auth = require('./auth');
 module.exports = {
   cipherOpt,
   immutableData,
+  container,
   mutableData,
   auth
 };
