@@ -3,7 +3,7 @@ const lib = require('../native/lib');
 
 class Nfs extends h.NetworkObject {
   static free(app, file) {
-    return lib.file_free(app.connection file);
+    return lib.file_free(app.connection, file);
   }
 }
 

@@ -59,7 +59,6 @@ class Permissions {
     // returns promise that resolves once done
     return lib.mdata_permissions_for_each(this.app.connection, this.mdata, fn);
   }
-
 }
 
 class EntryMutationTransaction extends h.NetworkObject {
@@ -250,7 +249,6 @@ class MutableData extends h.NetworkObject {
   serialise() {
     return lib.mdata_info_deserialise(this.app.connection, this.ref);
   }
-
 }
 
 class MutableDataProvider {

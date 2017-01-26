@@ -20,7 +20,7 @@ class SAFEApp extends EventEmitter {
   }
 
   get app() {
-    return this.connection;
+    return this._appInfo;
   }
 
   get networkState() {
