@@ -33,7 +33,9 @@ class SAFEApp extends EventEmitter {
 
   static fromAuthUri(appInfo, authUri) {
     const app = autoref(new SAFEApp(appInfo));
-    return app.auth.loginFromAuth(authUri);
+    return app.auth.loginFromURI(authUri)
+      .then((ref) => (this._connection = ref))
+      .then(() => app);
   }
 
   _networkStateUpdated(newState) {

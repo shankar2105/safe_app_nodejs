@@ -28,7 +28,7 @@ const version = require('../package.json').version;
  */
 function initializeApp(appInfo) {
     // FIXME: add auto-login features here later
-    const app = autoref(new SAFEApp(appInfo));
+    const app = autoref(new App(appInfo));
     return Promise.resolve(app);
 }
 
