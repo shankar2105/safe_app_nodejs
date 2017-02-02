@@ -72,6 +72,7 @@ class ImmutableData {
   }
 
   fetch(address) {
+    console.log('instructed to fetch', address);
     return lib.idata_fetch_self_encryptor(this.app.connection, address)
       .then((ref) => helpers.autoref(new ImmutableDataReader(this.app, ref)));
   }

@@ -31,8 +31,11 @@ class SAFEApp extends EventEmitter {
     const address = crypto.createHash('sha256').update(lookupName).digest();
 
     return this.mutableData.newPublic(address, consts.TAG_TYPE_DNS)
+      .then(w => {console.log('a', w); return w})
       .then(mdata => mdata.get(serviceName)
+        .then(w => {console.log('b', w); return w})
         .then(value => this.mutableData.newPublic(value.buf, consts.TAG_TYPE_WWW))
+        .then(w => {console.log('c', path, w); return w})
         .then(service => service.emulateAs("NFS").fetch(path)))
 
   }

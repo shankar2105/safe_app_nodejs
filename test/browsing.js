@@ -19,6 +19,7 @@ describe('Browsing', () => {
           const nfs = serviceMdata.emulateAs('NFS');
           // let's write the file
           return nfs.create(content)
+            .then(d => {console.log('d', d); return d})
             .then((file) => nfs.insert('', file))
             .then(() => {
               const dnsName = c.createHash('sha256').update(domain).digest();
@@ -31,6 +32,7 @@ describe('Browsing', () => {
 
   it('fetch content', () => createAnonTestApp()
     .then((app) => app.webFetch(`safe://${domain}`)
+      .then(f => {console.log('f', f); return f})
       .then((f) => app.immutableData.fetch(f.data_map_name))
       .then((i) => i.read())
       .then((co) => should(co).equal(content))

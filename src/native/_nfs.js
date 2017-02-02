@@ -8,8 +8,8 @@ const h = base.helpers;
 
 const File = Struct({
   size: t.u64,
-  created: t.Time, // TODO fix it for TM
-  modified: t.Time, // TODO fix it for TM
+  created: t.Time,
+  modified: t.Time,
   user_metadata_ptr: t.u8Pointer,
   user_metadata_len: t.usize,
   user_metadata_cap: t.usize,
