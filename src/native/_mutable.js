@@ -45,7 +45,7 @@ function strToBuffer(app, mdata) {
     Array.prototype.slice.call(arguments, 2).forEach(item => {
       const buf = item.buffer || (Buffer.isBuffer(item) ? item : new Buffer(item));
       args.push(buf);
-      args.push(buf.length);
+      args.push(buf.length || buf.byteLength);
     });
     return args;
 }

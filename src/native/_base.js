@@ -15,7 +15,7 @@ const bool = ref.types.bool;
 const NULL = ref.types.NULL;
 
 const u8Array = new ArrayType(u8);
-const XOR_NAME = new ArrayType(u8, 32); // FIXME: use exported const instead
+const XOR_NAME = ArrayType(u8, 32); // FIXME: use exported const instead
 const KEYBYTES = ArrayType(u8, 32); // FIXME: use exported const instead
 const SIGN_SECRETKEYBYTES = ArrayType(u8, 64);
 const NONCEBYTES = ArrayType(u8, 32); // I'm not sure if this is the right size or if it's 24

@@ -2,6 +2,7 @@ const h = require('../../helpers');
 const lib = require('../../native/lib');
 const FileType = require('../../native/types').File;
 const nativeH = require('../../native/helpers');
+const XOR_NAME = require('../../native/_base').types.XOR_NAME;
 const ref = require('ref');
 
 class File extends h.NetworkObject {
@@ -37,7 +38,7 @@ class NfsEmulation {
           .then((xorAddr) => new File(this.mData.app,
               new FileType({
                 size: 0,
-                data_map_name: xorAddr,
+                data_map_name: new XOR_NAME(xorAddr),
                 // FIXME: these are not correctly set
                 // nor transferred by the FFI api
                 created: nativeH.makeCTime(now),

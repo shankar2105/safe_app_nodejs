@@ -5,4 +5,4 @@
 [submodule "system_uri"]
 	path = system_uri
 	url = https://github.com/gnunicorn/system_uri.git
-	branch = fix-ffi-interface
+	branch = MAID-1942-fix-faulty-order-in-ffi-install
