@@ -6,7 +6,7 @@
 
 const readline = require('readline');
 const crypto = require('crypto');
-const safeApp  = require('../src/');
+const safeApp = require('../src/');
 const lib = require('../src/native/lib'); // FIXME: url opening should be exposed differently!
 
 
@@ -78,21 +78,25 @@ safeApp.initializeApp(appInfo)
     const nfs = mdata.emulateAs('NFS');
     console.log(`\nCreating new public mutable data with name :: ${publicName}`);
     return new Promise((resolve, reject) => {
-      nfs.create(new Buffer(fileContent))
-        .then((file) => nfs.insert(fileName, file))
+
+      appObj.mutableData.newPermissionSet()
+        .then((perm) => (permissionSet = perm))
+        .then(() => permissionSet.setAllow('ManagePermissions'))
+        .then(() => permissionSet.setAllow('Insert'))
+        .then(() => appObj.auth.getPubSignKey())
+        .then((key) => (signKey = key))
+        .then(() => appObj.mutableData.newPermissions())
+        .then((perm) => (permissions = perm))
+        .then(() => permissions.insertPermissionSet(signKey.ref, permissionSet.ref))
+        .then(() => appObj.mutableData.newEntries())
+        .then((entry) => (entries = entry))
+        .then(() => mdata.put(permissions, entries))
+        .then(() => nfs.create(fileContent))
+        .then((file) => {
+          return nfs.insert(fileName, file);
+        })
         .then((file) => console.log('File :: ', file))
-        // .then(() => appObj.mutableData.newPermissionSet())
-        // .then((perm) => (permissionSet = perm))
-        // .then(() => permissionSet.setAllow('ManagePermissions'))
-        // .then(() => appObj.auth.getPubSignKey())
-        // .then((key) => (signKey = key))
-        // .then(() => appObj.mutableData.newPermissions())
-        // .then((perm) => (permissions = perm))
-        // .then(() => permissions.insertPermissionSet(signKey.ref, permissionSet.ref))
-        // .then(() => appObj.mutableData.newEntries())
-        // .then((entry) => (entries = entry))
-        // .then(() => mdata.put(permissions, entries))
-        // .then(() => mdata.serialise())
+        .then(() => nfs.fetch(fileName))
         .then((res) => {
           console.log('\nSerialised Mutable data ::', res);
           return resolve(res);
