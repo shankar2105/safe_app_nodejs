@@ -33,12 +33,14 @@ module.exports = {
       console.log("response:", res);
       const file = File(res[0]);
       console.log("YAY, FILE: --- ", file);
-      const data_map_name = ref.reinterpret(file.data_map_name, 32);
+      const data_map_name = file.data_map_name;
       const size = file.size;
       const created = file.created;
       const modified = file.modified;
-      let metadata = ref.reinterpret(file.user_metadata_ptr,
-                                     file.user_metadata_len);
+      let metadata = file.user_metadata_ptr.isNull()
+                     ? null
+                     : ref.reinterpret(file.user_metadata_ptr,
+                                       file.user_metadata_len);
 
       if (metadata) {
         // we try to understand it as JSON

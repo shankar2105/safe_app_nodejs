@@ -35,6 +35,6 @@ describe('Browsing', () => {
       .then(f => {console.log('f', f); return f})
       .then((f) => app.immutableData.fetch(f.data_map_name))
       .then((i) => i.read())
-      .then((co) => should(co).equal(content))
+      .then((co) => should(co.toString()).equal(content))
   ));
 });

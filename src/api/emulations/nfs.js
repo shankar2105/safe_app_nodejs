@@ -37,7 +37,7 @@ class File extends h.NetworkObject {
   }
 
   get data_map_name() {
-    return nativeH.fromCTime(this._ref.data_map_name);
+    return this._ref.data_map_name;
   }
 
   get created() {
