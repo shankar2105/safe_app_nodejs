@@ -30,9 +30,9 @@ module.exports = {
   },
   api: {
     file_fetch: h.Promisified(null, [FilePtr, t.u64], (res) => {
-      console.log("response:", res);
+      // console.log("response:", res);
       const file = File(res[0]);
-      console.log("YAY, FILE: --- ", file);
+      // console.log("YAY, FILE: --- ", file);
       const data_map_name = file.data_map_name;
       const size = file.size;
       const created = file.created;

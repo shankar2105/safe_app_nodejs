@@ -32,7 +32,7 @@ class File extends h.NetworkObject {
       data.user_metadata_len = buf.length
       data.user_metadata_cap = buf.length
     }
-    console.log('-----', data);
+    // console.log('-----', data);
     return new t.File(data);
   }
 
