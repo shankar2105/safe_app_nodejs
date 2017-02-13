@@ -1,24 +1,23 @@
-
 const App = require('./app');
 const autoref = require('./helpers').autoref;
 const version = require('../package.json').version;
 
 /**
- * The main entry point to create a new SAFEApp 
- * @arg appInfo
- * @return {Promise(SafeApp)} promise to a SAFEApp instance
+ * The main entry point to create a new SAFEApp
+ * @arg {Object} appInfo
+ * @returns {Promise<SAFEApp>} promise to a SAFEApp instance
  * @example // Usage Example
  * const safe = require('safe');
  * const lib = require('safe/native/lib');
- * 
+ *
  * // starting initialisation
  * let prms = safe.initializeApp({
  *                      id: "net.maidsafe.example",
  *                      name: 'Example App',
  *                      vendor: 'MaidSafe Ltd.'
  *                     });
- * // we want read-append access to `_pictures` and 
- * // read access to `_videos`: 
+ * // we want read-append access to `_pictures` and
+ * // read access to `_videos`:
  * const containers = { '_videos': 'READ', '_pictures' : ['READ', 'INSERT']}
  * prms.then(app => app.auth.genAuthUri(containers
  *           ).then(uri => lib.openUri(uri)
@@ -27,9 +26,9 @@ const version = require('../package.json').version;
  *        ))
  */
 function initializeApp(appInfo) {
-    // FIXME: add auto-login features here later
-    const app = autoref(new App(appInfo));
-    return Promise.resolve(app);
+  // FIXME: add auto-login features here later
+  const app = autoref(new App(appInfo));
+  return Promise.resolve(app);
 }
 
 
@@ -38,7 +37,9 @@ function initializeApp(appInfo) {
  * to store securely), you can directly get an authenticated app
  * by using this helper function. Just provide said URI as the
  * second value.
- * @return {Promise(SafeApp)} promise to a SAFEApp instance
+ * @param {Object} appInfo
+ * @param {String} responseUrl
+ * @returns {Promise<SAFEApp>} promise to a SAFEApp instance
  */
 function fromAuthURI(appInfo, responseUrl) {
   return App.fromAuthUri(appInfo, responseUrl);

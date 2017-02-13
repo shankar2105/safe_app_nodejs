@@ -1,25 +1,25 @@
 const path = require('path');
 const FFI = require('ffi');
-
-const dir = path.dirname(__filename);
+const SYSTEM_URI_LIB_FILENAME = require('../consts').SYSTEM_URI_LIB_FILENAME;
 
 const h = require('./helpers');
 const t = require('./types');
-const makeFfiString = h.makeFfiString;
 
-const ffi = FFI.Library(path.join(dir, 'libsystem_uri'), {
-  open: [t.i32, [t.FfiString] ],
-  install: [t.i32, [t.FfiString, //bundle
-                    t.FfiString, //vendor
-                    t.FfiString, //name
-                    t.FfiString, //exec
-                    t.FfiString, //icon
-                    t.FfiString, //schemes
+const dir = path.dirname(__filename);
+
+const ffi = FFI.Library(path.join(dir, SYSTEM_URI_LIB_FILENAME), {
+  open: [t.i32, ['string'] ],
+  install: [t.i32, ['string', //bundle
+                    'string', //vendor
+                    'string', //name
+                    'string', //exec
+                    'string', //icon
+                    'string', //schemes
                     ] ],
 });
 
 function openUri(str) {
-  const ret = ffi.open(makeFfiString(str));
+  const ret = ffi.open(str);
   if (ret === -1) {
     throw new Error("Error occured opening " + str + " : " + ret);
   }
@@ -27,12 +27,12 @@ function openUri(str) {
 
 
 function registerUriScheme(appInfo, schemes) {
-  const bundle = makeFfiString(appInfo.bundle || appInfo.id);
-  const exec = makeFfiString(appInfo.exec ? appInfo.exec : process.execPath);
-  const vendor = makeFfiString(appInfo.vendor);
-  const name = makeFfiString(appInfo.name);
-  const icon = makeFfiString(appInfo.icon);
-  const joinedSchemes = makeFfiString(schemes.join ? schemes.join(',') : schemes);
+  const bundle = appInfo.bundle || appInfo.id;
+  const exec = appInfo.exec ? appInfo.exec : process.execPath;
+  const vendor = appInfo.vendor;
+  const name = appInfo.name;
+  const icon = appInfo.icon;
+  const joinedSchemes = schemes.join ? schemes.join(',') : schemes;
 
   const ret = ffi.install(bundle, vendor, name, exec, icon, joinedSchemes);
   if (ret === -1) {

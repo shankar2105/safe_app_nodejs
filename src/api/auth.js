@@ -22,8 +22,8 @@
 
 const lib = require('../native/lib');
 const nativeH = require('../native/helpers');
+const types = require('../native/types');
 const h = require('../helpers');
-const authTypes = require('../native/_auth').types;
 
 const makeAppInfo = nativeH.makeAppInfo;
 const makePermissions = nativeH.makePermissions;
@@ -84,24 +84,31 @@ class AuthProvider {
   genAuthUri(permissions, opts) {
     const perm = makePermissions(permissions);
     const appInfo = makeAppInfo(this.app.appInfo);
-    return lib.encode_auth_req(new authTypes.AuthReq({
+    return lib.encode_auth_req(new types.AuthReq({
       app: appInfo,
       app_container: !!(opts && opts.own_container),
       containers: perm,
-    }));
+      containers_len: perm.length,
+      containers_cap: perm.length
+    }).ref());
   }
 
   genContainerAuthUri(containers) {
     const ctnrs = makePermissions(containers);
     const appInfo = makeAppInfo(this.app.appInfo);
-    return lib.encode_containers_req(new authTypes.ContainerReq({
+    return lib.encode_containers_req(new types.ContainerReq({
       app: appInfo,
       containers: ctnrs,
-    }));
+      containers_len: ctnrs.length,
+      containers_cap: ctnrs.length
+    }).ref());
   }
 
   connectUnregistered() {
-    return lib.app_unregistered(this.app);
+    return lib.app_unregistered(this.app).then(() => {
+      this._registered = false;
+      return this.app;
+    });
   }
 
   refreshContainerAccess() {
@@ -122,7 +129,7 @@ class AuthProvider {
 
   getAccessContainerInfo(name) {
     return lib.access_container_get_container_mdata_info(this.app.connection, name)
-      .then((data) => this.app.container.wrapContainerInfo(data));
+      .then((data) => this.app.mutableData.wrapMdata(data));
   }
 
   loginFromURI(responseUri) {
@@ -132,26 +139,33 @@ class AuthProvider {
 
       const authGranted = resp[1];
       this._registered = true;
-      return lib.app_registered(this.app, authGranted).then((app) =>
-        this.refreshContainerAccess().then(() => app));
+      return lib.app_registered(this.app, authGranted);
+      // FIXME: in the future: automatically check for the
+      // containers, too
+      // .then((app) =>
+      //   this.refreshContainerAccess().then(() => app));
     });
   }
 
   // app key management
   getPubSignKey() {
-    return lib.app_pub_sign_key(this.app.connection).then((c) => h.autoref(new SignKey(this.app, c)));
+    return lib.app_pub_sign_key(this.app.connection)
+        .then((c) => h.autoref(new SignKey(this.app, c)));
   }
 
   getPubEncKey() {
-    return lib.app_pub_enc_key(this.app.connection).then((c) => h.autoref(new PubEncKey(this.app, c)));
+    return lib.app_pub_enc_key(this.app.connection)
+        .then((c) => h.autoref(new PubEncKey(this.app, c)));
   }
 
   getSignKeyFromRaw(raw) {
-    return lib.sign_key_new(this.app.connection, raw).then((c) => h.autoref(new SignKey(this.app, c)));
+    return lib.sign_key_new(this.app.connection, raw)
+        .then((c) => h.autoref(new SignKey(this.app, c)));
   }
 
   getEncKeyKeyFromRaw(raw) {
-    return lib.enc_key_new(this.app.connection, raw).then((c) => h.autoref(new PubEncKey(this.app, c)));
+    return lib.enc_key_new(this.app.connection, raw)
+        .then((c) => h.autoref(new PubEncKey(this.app, c)));
   }
 }
 
