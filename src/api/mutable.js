@@ -133,11 +133,7 @@ class Entries extends h.NetworkObject {
   forEach(fn) {
     // iterate through all key-value-pairs
     // returns promise that resolves once done
-    const cb = ffi.Callback(t.Void, [t.VoidPtr, t.u8Pointer, t.usize], (udata, key, len) => {
-      console.log('Ffi Key :: ', key, len);
-      fn(key);
-    });
-    return lib.mdata_entries_for_each(this.app.connection, this.ref, cb);
+    return lib.mdata_entries_for_each(this.app.connection, this.ref, fn);
   }
 
   insert(keyName, value) {
@@ -157,10 +153,14 @@ class Keys extends h.NetworkObject {
     return lib.mdata_keys_len(this.app.connection, this.ref);
   }
 
-  forEach(fn) {
+  forEach(func) {
     // iterate through all key-value-pairs
     // returns promise that resolves once done
-    return lib.mdata_keys_for_each(this.app, this.ref, fn);
+    const cb = ffi.Callback(t.Void, [t.VoidPtr, t.u8Pointer, t.usize], (udata, key, len) => {
+      console.log('Ffi Key :: ', key, len);
+      func(key);
+    });
+    return lib.mdata_keys_for_each(this.app, this.ref, cb);
   }
 
   static free(app, ref) {
