@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const should = require('should');
 const h = require('./helpers');
 
@@ -256,6 +257,26 @@ describe('Mutable Data', () => {
                 })
             ))))
     );
+
+    it('a remove mutation from existing entries and fetch key-val of entries using forEach', () => {
+      const TEST_ENTRIES_X = { key1: 'value1', key2: crypto.randomBytes(36) };
+      return app.mutableData.newRandomPublic(TAG_TYPE)
+        .then((m) => m.quickSetup(TEST_ENTRIES_X)
+          .then(() => m.getEntries()
+            .then((entries) => {
+              const keys = [];
+              return entries.mutate()
+                .then((mut) => mut.remove('key2', 1)
+                  .then(() => m.applyEntriesMutation(mut))
+                  .then(() => entries.forEach((key, val, ver) => {
+                    const temp = {};
+                    temp[key.toString()] = val.buf.toString()
+                    keys.push(temp);
+                  }))
+                  .then(() => console.log('keys ::', keys))
+                );
+            })))
+    });
 
     it('an insert mutation from new mutation obj', () => app.mutableData.newRandomPublic(TAG_TYPE)
         .then((m) => m.quickSetup(TEST_ENTRIES)
