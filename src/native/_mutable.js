@@ -18,6 +18,11 @@ const MDataKeysHandle = t.ObjectHandle;
 const MDataValuesHandle = t.ObjectHandle;
 const MDataEntryActionsHandle = t.ObjectHandle;
 const bufferTypes = [t.u8Pointer, t.usize, t.usize];
+
+/**
+* One of: `Insert`, `Update`, `Delete`, `ManagePermissions`
+* @typedef {String} MDataAction 
+**/
 const MDataAction = new Enum({
   Insert: 0,
   Update: 1,
@@ -29,6 +34,30 @@ function bufferLastEntry() {
   let str = new Buffer(arguments[arguments.length - 1]);
   return Array.prototype.slice.call(arguments, 0, arguments.length - 1)
         .concat([str, str.length]);
+}
+
+function keyValueCallBackLastEntry(types) {
+  let fn = arguments[arguments.length - 1];
+  if (typeof fn !== 'function') throw Error('A function parameter _must be_ provided')
+
+  let cb = ffi.Callback("void", types, function(uctx) {
+    let args = [];
+    if (arguments.length === 3) {
+      // the callback is only for an entry's key
+      args.push(ref.reinterpret(arguments[1], arguments[2], 0));
+    } else if (arguments.length === 4) {
+      // the callback is only for an entry's value (with its version)
+      args.push(readValueToBufferNoCapacity([arguments[1], arguments[2], arguments[3]]));
+    } else { // arguments.length === 6
+      // the callback is for both entry's key and value (with its version)
+      args.push(ref.reinterpret(arguments[1], arguments[2], 0));
+      args.push(readValueToBufferNoCapacity([arguments[3], arguments[4], arguments[5]]));
+    }
+    fn.apply(fn, args);
+  });
+
+  return Array.prototype.slice.call(arguments, 1, arguments.length - 1)
+            .concat(cb);
 }
 
 function translateXorName(appPtr, str, tag) {
@@ -44,7 +73,7 @@ function translateXorName(appPtr, str, tag) {
 function strToBuffer(app, mdata) {
     const args = [app, mdata];
     Array.prototype.slice.call(arguments, 2).forEach(item => {
-      const buf = item.buffer || (Buffer.isBuffer(item) ? item : new Buffer(item));
+      const buf = Buffer.isBuffer(item) ? item : (item.buffer || new Buffer(item));
       args.push(buf);
       args.push(buf.length);
     });
@@ -194,13 +223,16 @@ module.exports = {
     mdata_entries_insert: Promisified(strToBuffer, []),
     mdata_entries_len: Promisified(null, t.usize),
     mdata_entries_get: Promisified(strToBuffer, [t.u8Pointer, t.usize, t.u64], readValueToBufferNoCapacity),
-    mdata_entries_for_each: Promisified(null, []),
+    mdata_entries_for_each: Promisified(keyValueCallBackLastEntry.bind(null,
+          ['pointer', t.u8Pointer, t.usize, t.u8Pointer, t.usize, t.u64]), []),
     mdata_entries_free: Promisified(null, []),
     mdata_keys_len: Promisified(null, t.usize),
-    mdata_keys_for_each: Promisified(null, []),
+    mdata_keys_for_each: Promisified(keyValueCallBackLastEntry.bind(null,
+          ['pointer', t.u8Pointer, t.usize]), []),
     mdata_keys_free: Promisified(null, []),
     mdata_values_len: Promisified(null, t.usize),
-    mdata_values_for_each: Promisified(null, []),
+    mdata_values_for_each: Promisified(keyValueCallBackLastEntry.bind(null,
+          ['pointer', t.u8Pointer, t.usize, t.u64]), []),
     mdata_values_free: Promisified(null, []),
   }
 };
