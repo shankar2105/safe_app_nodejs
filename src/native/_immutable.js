@@ -13,13 +13,27 @@ const SEReadHandle = t.ObjectHandle;
 function translateXorName(appPtr, str) {
   let name = str;
   if (str.buffer) {
-    name = str.buffer;
+    if (str.buffer.buffer) {
+      name = str.buffer;
+    } else {
+      name = str;
+    }
+  } else if (Array.isArray(str)) {
+    name = t.XOR_NAME(str).ref().readPointer(0)
   } else {
     const b = new Buffer(str);
     if (b.length != 32) throw Error("XOR Names _must be_ 32 bytes long.")
-    name = t.XOR_NAME(b).ref();
+    name = t.XOR_NAME(b).ref().readPointer(0);
   }
   return [appPtr, name]
+}
+
+function copyFromRefArray(refArray){
+  let target = [];
+  for (var i = 0; i < refArray.length; i++) {
+    target.push(refArray[i])
+  }
+  return target;
 }
 
 
@@ -46,7 +60,7 @@ module.exports = {
     }, null),
     idata_close_self_encryptor: h.Promisified(null, 'pointer',
       // make a copy to ensure the data stays around
-      resp => t.XOR_NAME(ref.reinterpret(resp[0], 32))),
+      resp => copyFromRefArray(t.XOR_NAME(ref.reinterpret(resp[0], 32)))),
     idata_fetch_self_encryptor: h.Promisified(translateXorName, SEReadHandle),
     idata_size: h.Promisified(null, t.u64),
     idata_read_from_self_encryptor: h.Promisified(null, [t.u8Pointer, t.usize, t.usize], h.asBuffer),

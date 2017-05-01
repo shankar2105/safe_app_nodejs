@@ -7,7 +7,7 @@ const base = require('./_base');
 const t = base.types;
 const h = base.helpers;
 const Promisified = base.helpers.Promisified;
-const SignKeyHandle = require('./_misc').types.SignKeyHandle;
+const SignKeyHandle = require('./_crypto').types.SignKeyHandle;
 
 const MDataInfo = Struct({});
 const MDataInfoHandle = ref.refType(MDataInfo);
@@ -78,7 +78,7 @@ function translateXorName(appPtr, str, tag) {
   if (!Buffer.isBuffer(str)) {
     const b = new Buffer(str);
     if (b.length != 32) throw Error("XOR Names _must be_ 32 bytes long.")
-    name = t.XOR_NAME(b).ref();
+    name = t.XOR_NAME(b).ref().readPointer(0);
   }
   return [appPtr, name, tag]
 }
@@ -109,7 +109,7 @@ function strToBufferButLastEntry(app, mdata) {
 // args[2] is expected to be content version
 function readValueToBuffer(args) {
     return {
-        buf: new Buffer(ref.reinterpret(args[0], args[1], 0)),
+        buf: ref.isNull(args[0]) ? args[0] : new Buffer(ref.reinterpret(args[0], args[1], 0)),
         version: args[2]
     }
 }

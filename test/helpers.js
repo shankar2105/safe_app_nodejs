@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const App = require('../src/app');
 const h = require('../src/helpers');
 
@@ -17,12 +18,15 @@ function createAnonTestApp(scope) {
 
 function createAuthenticatedTestApp(scope, access) {
   const app = createTestApp(scope);
-  app.auth.loginForTest(access); // Promise, but immediate
+  app.auth.loginForTest(access || {}); // Promise, but immediate
   return app;
 }
+
+const createRandomXorName = () => crypto.randomBytes(32);
 
 module.exports = {
   createTestApp,
   createAnonTestApp,
-  createAuthenticatedTestApp
+  createAuthenticatedTestApp,
+  createRandomXorName
 };
