@@ -1,3 +1,4 @@
+const fs = require('fs');
 const crypto = require('crypto');
 const should = require('should');
 const h = require('./helpers');
@@ -912,6 +913,37 @@ describe('Mutable Data', () => {
           })
         ))
     );
+
+    it('write and read in chunks', () => app.mutableData.newRandomPublic(TAG_TYPE)
+      .then((m) => m.quickSetup({}).then(() => m.emulateAs('nfs'))
+        .then((nfs) => {
+          const textData = fs.readFileSync('./test/testFile.txt');
+          return nfs.create(textData)
+            .then((file) => nfs.insert('test.txt', file))
+            .then(() => nfs.fetch('test.txt'))
+            .then((file) => nfs.open(file, 4))
+            .then((f) => f.size()
+              .then((totalSize) => {
+                console.log('totalSize', totalSize);
+                return new Promise((resolve, reject) => {
+                  let sizeRead = 0; 
+                  const chunkSize = 1000;
+                  const readFile = (size) => {
+                    f.read(sizeRead, size)
+                      .then((data) => {
+                        console.log('data', data.length, data);
+                        sizeRead = size;
+                        let nextlen = sizeRead + chunkSize;
+                        nextlen = nextlen >= totalSize ? totalSize : nextlen;
+
+                        return readFile(nextlen);
+                      }).catch(reject)
+                  };
+                  readFile(chunkSize);
+                });
+              }));
+        })
+    ))
   });
 
   describe('forceCleanUp', () => {

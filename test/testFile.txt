@@ -114,7 +114,6 @@ class File {
     if (!this._fileCtx) {
       return Promise.reject(new Error('File is not open'));
     }
-    console.log('position, len', position, len)
     return lib.file_read(this._connection, this._fileCtx, position, len);
   }
 
