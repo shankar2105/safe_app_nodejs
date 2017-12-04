@@ -223,13 +223,13 @@ class SAFEApp extends EventEmitter {
         const openedFile = await emulation.open(file, consts.pubConsts.NFS_FILE_MODE_READ);
         const data = await openedFile.read(
           consts.pubConsts.NFS_FILE_START, consts.pubConsts.NFS_FILE_END);
-          const mimeType = mime.getType(nodePath.extname(filePath));
-          resolve({
-            headers: {
-              'Content-Type': mimeType
-            },
-            body: data
-          });
+        const mimeType = mime.getType(nodePath.extname(filePath));
+        resolve({
+          headers: {
+            'Content-Type': mimeType
+          },
+          body: data
+        });
       } catch (e) {
         reject(e);
       }
